@@ -6,7 +6,24 @@ type RutasState = {
 };
 
 const initialState: RutasState = {
-  rutas: [],
+  rutas: [
+    {
+      id: "default-1",
+      nombre: "Ruta por la Mañana",
+      estado: "planificada",
+      solicitudIds: [],
+      distanciaKm: 10.5,
+      combustibleEstimado: 5,
+    },
+    {
+      id: "default-2",
+      nombre: "Ruta por la Tarde",
+      estado: "planificada",
+      solicitudIds: [],
+      distanciaKm: 15.2,
+      combustibleEstimado: 8,
+    },
+  ],
 };
 
 const rutasSlice = createSlice({
