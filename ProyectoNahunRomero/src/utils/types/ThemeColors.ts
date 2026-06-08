@@ -17,4 +17,4 @@ export type ThemeColors = {
   headerText: string;
   error: string;
   border: string;
-};
+} ;

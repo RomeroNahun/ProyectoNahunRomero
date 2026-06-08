@@ -1,4 +1,4 @@
-// Rol del usuario dentro de la app
+// Rol del usuario dentro de la app.
 export type Rol = "residente" | "recolector";
 
 // Tipo de residuo que se desea recolectar
@@ -31,7 +31,6 @@ export type Solicitud = {
   tipoResiduo: TipoResiduo;
   prioridad: Prioridad;
   estado: EstadoSolicitud;
-  // Hora programada (texto libre, ej: "08:00"); vacio si es inmediata
   horaProgramada: string;
   notas: string;
   creadaEn: number;
