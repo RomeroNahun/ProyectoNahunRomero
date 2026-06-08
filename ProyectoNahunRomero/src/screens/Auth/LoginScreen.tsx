@@ -14,7 +14,7 @@ import { Rol, ROLES, ROL_LABELS } from "../../utils/types/Recoleccion";
 type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
 export default function LoginScreen({ navigation }: Props) {
-  const [email, setEmail] = useState("romeronahun1@unitec.edu");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rol, setRol] = useState<Rol>("residente");
 

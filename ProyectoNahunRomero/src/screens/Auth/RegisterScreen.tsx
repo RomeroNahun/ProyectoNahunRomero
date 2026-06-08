@@ -1,4 +1,16 @@
-
+import { useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import CustomInput from "../../components/CustomInput";
+import CustomButton from "../../components/CustomButton";
+import ScreenWrapper from "../../components/ScreenWrapper";
+import SectionTitle from "../../components/SectionTitle";
+import { useAuth } from "../../contexts/AuthContext";
+import { useTheme } from "../../contexts/ThemeContext";
+import { useAppDispatch } from "../../store/hooks";
+import { updateProfile } from "../../store/slices/userProfileSlice";
+import { RootStackParamList } from "../../navigation/StackNavigator";
+import { Rol, ROLES, ROL_LABELS } from "../../utils/types/Recoleccion";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Register">;
 
