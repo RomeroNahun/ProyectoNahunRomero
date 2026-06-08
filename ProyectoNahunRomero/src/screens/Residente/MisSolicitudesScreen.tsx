@@ -2,8 +2,12 @@ import { Text, StyleSheet } from "react-native";
 import { CompositeScreenProps } from "@react-navigation/native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import ScreenWrapper from "../../components/ScreenWrapper";
+import SectionTitle from "../../components/SectionTitle";
 import SolicitudCard from "../../components/SolicitudCard";
 import CustomButton from "../../components/CustomButton";
+import { useTheme } from "../../contexts/ThemeContext";
+import { useAppSelector } from "../../store/hooks";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { ResidenteTabsParamList } from "../../navigation/ResidenteTabsNavigator";
 
@@ -12,7 +16,9 @@ type Props = CompositeScreenProps<
   NativeStackScreenProps<RootStackParamList>
 >;
 
-
+export default function MisSolicitudesScreen({ navigation }: Props) {
+  const solicitudes = useAppSelector((state) => state.solicitudes.solicitudes);
+  const { colors } = useTheme();
 
   return (
     <ScreenWrapper>
@@ -45,3 +51,14 @@ type Props = CompositeScreenProps<
       )}
     </ScreenWrapper>
   );
+}
+
+const styles = StyleSheet.create({
+  empty: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 14,
+  },
+});
+
+

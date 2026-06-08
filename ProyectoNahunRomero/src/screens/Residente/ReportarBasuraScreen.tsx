@@ -5,11 +5,27 @@ import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
+import ScreenWrapper from "../../components/ScreenWrapper";
+import SectionTitle from "../../components/SectionTitle";
+import { useTheme } from "../../contexts/ThemeContext";
+import { useAppDispatch } from "../../store/hooks";
+import { addSolicitud } from "../../store/slices/solicitudesSlice";
+import { RootStackParamList } from "../../navigation/StackNavigator";
+import { ResidenteTabsParamList } from "../../navigation/ResidenteTabsNavigator";
+import {
+  TipoResiduo,
+  TIPOS_RESIDUO,
+  TIPO_RESIDUO_LABELS,
+} from "../../utils/types/Recoleccion";
 
-
+type Props = CompositeScreenProps<
+  BottomTabScreenProps<ResidenteTabsParamList, "Reportar">,
+  NativeStackScreenProps<RootStackParamList>
+>;
 
 export default function ReportarBasuraScreen({ navigation }: Props) {
-
+  const dispatch = useAppDispatch();
+  const { colors } = useTheme();
 
   const [direccion, setDireccion] = useState("");
   const [tipoResiduo, setTipoResiduo] = useState<TipoResiduo>("organica");
@@ -74,7 +90,12 @@ export default function ReportarBasuraScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    marginTop: 12,
+    marginBottom: 6,
+  },
   row: {
     flexDirection: "row",
     flexWrap: "wrap",

@@ -2,6 +2,13 @@ import { Text, StyleSheet } from "react-native";
 import { CompositeScreenProps } from "@react-navigation/native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import ScreenWrapper from "../../components/ScreenWrapper";
+import SectionTitle from "../../components/SectionTitle";
+import SolicitudCard from "../../components/SolicitudCard";
+import { useTheme } from "../../contexts/ThemeContext";
+import { useAppSelector } from "../../store/hooks";
+import { RootStackParamList } from "../../navigation/StackNavigator";
+import { RecolectorTabsParamList } from "../../navigation/RecolectorTabsNavigator";
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<RecolectorTabsParamList, "Pendientes">,

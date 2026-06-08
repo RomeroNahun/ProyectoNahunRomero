@@ -5,6 +5,13 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import CustomButton from "../../components/CustomButton";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import SectionTitle from "../../components/SectionTitle";
+import SolicitudCard from "../../components/SolicitudCard";
+import { useAuth } from "../../contexts/AuthContext";
+import { useTheme } from "../../contexts/ThemeContext";
+import { i18n } from "../../contexts/LanguageContext";
+import { useAppSelector } from "../../store/hooks";
+import { RootStackParamList } from "../../navigation/StackNavigator";
+import { ResidenteTabsParamList } from "../../navigation/ResidenteTabsNavigator";
 
 type Props = CompositeScreenProps<
   BottomTabScreenProps<ResidenteTabsParamList, "Inicio">,
