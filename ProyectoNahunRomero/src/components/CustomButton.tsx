@@ -1,4 +1,4 @@
-import { Text, TouchableOpacity, StyleSheet } from "react-native";
+import { Text, TouchableOpacity, StyleSheet, ViewStyle, StyleProp } from "react-native";
 import { useTheme } from "../contexts/ThemeContext";
 import { ThemeColors } from "../utils/types/ThemeColors";
 
@@ -7,18 +7,20 @@ type CustomButtonProps = {
   onPress: () => void;
   // union de literales para el estilo del boton
   variant?: "primary" | "secondary" | "tertiary";
+  style?: StyleProp<ViewStyle>;
 };
 
 export default function CustomButton({
   title,
   onPress,
   variant = "primary",
+  style,
 }: CustomButtonProps) {
   const { colors } = useTheme();
   const styles = getStyles(variant, colors);
 
   return (
-    <TouchableOpacity style={styles.button} onPress={onPress}>
+    <TouchableOpacity style={[styles.button, style]} onPress={onPress}>
       <Text style={styles.buttonText}>{title}</Text>
     </TouchableOpacity>
   );
@@ -30,7 +32,7 @@ const getStyles = (
 ) =>
   StyleSheet.create({
     button: {
-      borderRadius: 6,
+      borderRadius: 12,
       // operador ternario para elegir el color de fondo segun la variante
       backgroundColor:
         variant === "primary"

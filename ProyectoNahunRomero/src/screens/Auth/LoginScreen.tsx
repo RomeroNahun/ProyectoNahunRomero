@@ -28,7 +28,9 @@ export default function LoginScreen({ navigation }: Props) {
         // segun el rol elegido se entra a una de las dos secciones
         navigation.reset({
           index: 0,
-          routes: [{ name: rol === "residente" ? "ResidenteTabs" : "RecolectorTabs" }],
+          routes: [
+            { name: rol === "residente" ? "ResidenteTabs" : "RecolectorTabs" },
+          ],
         });
       } else {
         console.log("Correo inválido");
@@ -58,7 +60,9 @@ export default function LoginScreen({ navigation }: Props) {
         onChange={setPassword}
       />
 
-      <Text style={[styles.label, { color: colors.primary }]}>Ingresar como</Text>
+      <Text style={[styles.label, { color: colors.primary }]}>
+        Ingresar como
+      </Text>
       <View style={styles.rolRow}>
         {ROLES.map((r) => (
           <CustomButton
@@ -71,11 +75,16 @@ export default function LoginScreen({ navigation }: Props) {
       </View>
 
       <View style={styles.actions}>
-        <CustomButton title={i18n.t("signIn")} onPress={handleLogin} />
+        <CustomButton
+          title={i18n.t("signIn")}
+          onPress={handleLogin}
+          style={styles.fullButton}
+        />
         <CustomButton
           title={i18n.t("register")}
           onPress={() => navigation.navigate("Register")}
           variant="secondary"
+          style={styles.fullButton}
         />
       </View>
     </ScreenWrapper>
@@ -87,7 +96,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
     marginTop: 12,
-    marginBottom: 6,
+    marginBottom: 40,
   },
   rolRow: {
     flexDirection: "row",
@@ -97,5 +106,10 @@ const styles = StyleSheet.create({
   actions: {
     gap: 10,
     marginTop: 8,
+  },
+  fullButton: {
+    width: "100%",
+    borderRadius: 30,
+    paddingVertical: 14,
   },
 });
