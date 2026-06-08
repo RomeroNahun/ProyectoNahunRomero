@@ -4,7 +4,7 @@ import { ThemeColors } from "../utils/types/ThemeColors";
 
 type ThemeMode = "light" | "dark";
 
-// Tema claro: base blanca con acentos verdes
+// Tema claro: base blanca con verdes
 const lightColors: ThemeColors = {
   background: "#ffffff",
   text: "#14241a",
