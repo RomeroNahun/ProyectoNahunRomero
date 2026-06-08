@@ -1,5 +1,11 @@
 import { View, Text, StyleSheet, Switch } from "react-native";
 import CustomButton from "../../components/CustomButton";
+import ScreenWrapper from "../../components/ScreenWrapper";
+import SectionTitle from "../../components/SectionTitle";
+import { useAuth } from "../../contexts/AuthContext";
+import { useLanguage, i18n } from "../../contexts/LanguageContext";
+import { useTheme } from "../../contexts/ThemeContext";
+import { navigationRef } from "../../navigation/NavigationService";
 
 
 export default function SettingsScreen() {

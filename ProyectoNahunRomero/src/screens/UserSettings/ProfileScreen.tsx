@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { updateProfile } from "../../store/slices/userProfileSlice";
 import { ROL_LABELS } from "../../utils/types/Recoleccion";
 
+
 export default function ProfileScreen() {
   const { user } = useAuth();
   const dispatch = useAppDispatch();
