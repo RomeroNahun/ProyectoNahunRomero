@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Image } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
@@ -42,6 +42,14 @@ export default function LoginScreen({ navigation }: Props) {
 
   return (
     <ScreenWrapper>
+      <View style={styles.logoContainer}>
+        <Image
+          source={require("../../../assets/icon.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
+
       <SectionTitle
         title="EcoRuta"
         subtitle="Recolección de basura para un pueblo más limpio"
@@ -92,11 +100,21 @@ export default function LoginScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
+  logoContainer: {
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 10,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    borderRadius: 20,
+  },
   label: {
     fontSize: 14,
     fontWeight: "600",
     marginTop: 12,
-    marginBottom: 40,
+    marginBottom: 6,
   },
   rolRow: {
     flexDirection: "row",
