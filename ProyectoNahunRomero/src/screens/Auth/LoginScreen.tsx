@@ -1,43 +1,43 @@
 import { useState } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, StyleSheet, Image, Alert } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import SectionTitle from "../../components/SectionTitle";
 import { useAuth } from "../../contexts/AuthContext";
-import { useTheme } from "../../contexts/ThemeContext";
 import { i18n } from "../../contexts/LanguageContext";
 import { RootStackParamList } from "../../navigation/StackNavigator";
-import { Rol, ROLES, ROL_LABELS } from "../../utils/types/Recoleccion";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Login">;
 
 export default function LoginScreen({ navigation }: Props) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rol, setRol] = useState<Rol>("residente");
+  const [cargando, setCargando] = useState(false);
 
   const { login } = useAuth();
-  const { colors } = useTheme();
 
-  const handleLogin = () => {
-    try {
-      const allowed = login(email, rol);
-      if (allowed) {
-        // segun el rol elegido se entra a una de las dos secciones
-        navigation.reset({
-          index: 0,
-          routes: [
-            { name: rol === "residente" ? "ResidenteTabs" : "RecolectorTabs" },
-          ],
-        });
-      } else {
-        console.log("Correo inválido");
-      }
-    } catch (error) {
-      console.log(error);
+  const handleLogin = async () => {
+    if (!email.trim() || !password) {
+      Alert.alert("Error", "Ingresa tu correo y contraseña");
+      return;
     }
+    setCargando(true);
+    const res = await login(email.trim(), password);
+    setCargando(false);
+
+    if (res.error) {
+      Alert.alert("No se pudo iniciar sesión", res.error);
+      return;
+    }
+    // el rol viene de la cuenta: entra a la seccion que le corresponde
+    navigation.reset({
+      index: 0,
+      routes: [
+        { name: res.rol === "recolector" ? "RecolectorTabs" : "ResidenteTabs" },
+      ],
+    });
   };
 
   return (
@@ -68,23 +68,9 @@ export default function LoginScreen({ navigation }: Props) {
         onChange={setPassword}
       />
 
-      <Text style={[styles.label, { color: colors.primary }]}>
-        Ingresar como
-      </Text>
-      <View style={styles.rolRow}>
-        {ROLES.map((r) => (
-          <CustomButton
-            key={r}
-            title={ROL_LABELS[r]}
-            onPress={() => setRol(r)}
-            variant={rol === r ? "primary" : "tertiary"}
-          />
-        ))}
-      </View>
-
       <View style={styles.actions}>
         <CustomButton
-          title={i18n.t("signIn")}
+          title={cargando ? "Ingresando..." : i18n.t("signIn")}
           onPress={handleLogin}
           style={styles.fullButton}
         />
@@ -109,17 +95,6 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 20,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: "600",
-    marginTop: 12,
-    marginBottom: 6,
-  },
-  rolRow: {
-    flexDirection: "row",
-    gap: 10,
-    marginBottom: 12,
   },
   actions: {
     gap: 10,
