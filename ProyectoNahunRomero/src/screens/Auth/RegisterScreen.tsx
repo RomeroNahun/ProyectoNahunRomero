@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
@@ -7,8 +7,6 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import SectionTitle from "../../components/SectionTitle";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
-import { useAppDispatch } from "../../store/hooks";
-import { updateProfile } from "../../store/slices/userProfileSlice";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { Rol, ROLES, ROL_LABELS } from "../../utils/types/Recoleccion";
 
@@ -20,22 +18,46 @@ export default function RegisterScreen({ navigation }: Props) {
   const [telefono, setTelefono] = useState("");
   const [password, setPassword] = useState("");
   const [rol, setRol] = useState<Rol>("residente");
+  const [cargando, setCargando] = useState(false);
 
-  const { login } = useAuth();
+  const { register } = useAuth();
   const { colors } = useTheme();
-  const dispatch = useAppDispatch();
-
-  const handleRegister = () => {
-    const allowed = login(email, rol);
-    if (!allowed) {
-      console.log("Correo inválido");
+//Validacion, que todos los datos esten ingresados en el Formulario de Registro
+  const handleRegister = async () => {
+    if (!nombre.trim() || !email.trim() || !telefono.trim() || !password) {
+      Alert.alert("Error", "Todos los campos son obligatorios");
       return;
     }
-    // guarda los datos basicos del perfil en redux
-    dispatch(updateProfile({ nombre, telefono, rol }));
+    setCargando(true);
+    const res = await register({
+      email: email.trim(),
+      password,
+      nombre: nombre.trim(),
+      telefono: telefono.trim(),
+      rol,
+    });
+    setCargando(false);
+
+    if (res.error) {
+      Alert.alert("Error de registro", res.error);
+      return;
+    }
+
+    // si Supabase pide confirmar el correo, no hay sesion todavia
+    if (res.needsConfirmation) {
+      Alert.alert(
+        "¡Casi listo!",
+        "Revisa tu correo para confirmar la cuenta y luego inicia sesión.",
+        [{ text: "OK", onPress: () => navigation.navigate("Login") }],
+      );
+      return;
+    }
+
     navigation.reset({
       index: 0,
-      routes: [{ name: rol === "residente" ? "ResidenteTabs" : "RecolectorTabs" }],
+      routes: [
+        { name: res.rol === "recolector" ? "RecolectorTabs" : "ResidenteTabs" },
+      ],
     });
   };
 
@@ -71,7 +93,10 @@ export default function RegisterScreen({ navigation }: Props) {
       </View>
 
       <View style={styles.actions}>
-        <CustomButton title="Registrarme" onPress={handleRegister} />
+        <CustomButton
+          title={cargando ? "Creando cuenta..." : "Registrarme"}
+          onPress={handleRegister}
+        />
         <CustomButton
           title="Ya tengo cuenta"
           onPress={() => navigation.goBack()}
