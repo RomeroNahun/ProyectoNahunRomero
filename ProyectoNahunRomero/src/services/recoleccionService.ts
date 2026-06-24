@@ -1,4 +1,7 @@
+import { decode } from "base64-arraybuffer";
+import { File } from "expo-file-system";
 import { supabase } from "./supabaseClient";
+import { env } from "../config/env";
 import {
   EstadoRuta,
   EstadoSolicitud,
@@ -19,6 +22,7 @@ type SolicitudRow = {
   hora_programada: string;
   notas: string;
   creada_en: string;
+  foto_url: string | null;
 };
 
 type RutaRow = {
@@ -49,6 +53,7 @@ const mapSolicitud = (r: SolicitudRow): Solicitud => ({
   horaProgramada: r.hora_programada ?? "",
   notas: r.notas ?? "",
   creadaEn: new Date(r.creada_en).getTime(),
+  fotoUrl: r.foto_url ?? undefined,
 });
 
 const mapRuta = (r: RutaRow, solicitudIds: string[]): Ruta => ({
@@ -93,10 +98,37 @@ export const insertSolicitud = async (
       estado,
       hora_programada: input.horaProgramada,
       notas: input.notas,
+      foto_url: input.fotoUrl ?? null,
     })
     .select()
     .single();
   return mapSolicitud(check(data as SolicitudRow, error));
+};
+
+// ============================================================
+// STORAGE (fotos de solicitudes)
+// ============================================================
+// Sube una imagen local al bucket configurado y devuelve su URL publica.
+// Se lee como base64 y se convierte a ArrayBuffer, que es la forma fiable de
+// subir binarios desde React Native.
+export const uploadFotoSolicitud = async (uri: string): Promise<string> => {
+  const base64 = await new File(uri).base64();
+  // conserva la extension original del archivo
+  const dot = uri.lastIndexOf(".");
+  const ext = dot > -1 ? uri.slice(dot) : ".jpg";
+  const random = Math.random().toString(36).slice(2, 8);
+  const path = `${Date.now()}-${random}${ext}`;
+
+  const { error } = await supabase.storage
+    .from(env.supabaseBucket)
+    .upload(path, decode(base64), {
+      contentType: "image/jpeg",
+      upsert: false,
+    });
+  if (error) throw new Error(error.message);
+
+  const { data } = supabase.storage.from(env.supabaseBucket).getPublicUrl(path);
+  return data.publicUrl;
 };
 
 export const updateSolicitud = async (

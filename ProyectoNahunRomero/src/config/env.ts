@@ -11,4 +11,6 @@ const getEnvVar = (key: string): string => {
 export const env = {
   supabaseUrl: getEnvVar("EXPO_PUBLIC_SUPABASE_URL"),
   supabaseAnonKey: getEnvVar("EXPO_PUBLIC_SUPABASE_ANON_KEY"),
+  // bucket donde se guardan las fotos de las solicitudes
+  supabaseBucket: process.env.EXPO_PUBLIC_SUPABASE_BUCKET ?? "fotos-solicitudes",
 } as const;

@@ -34,6 +34,8 @@ export type Solicitud = {
   horaProgramada: string;
   notas: string;
   creadaEn: number;
+  // URL publica de la foto adjunta en Supabase Storage (opcional)
+  fotoUrl?: string;
 };
 
 // Ruta optimizada que agrupa varias solicitudes para ahorrar combustible
