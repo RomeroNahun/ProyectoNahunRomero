@@ -28,7 +28,7 @@ export default function CustomInput({
   const isPasswordField = type === "password";
 
   const icon: (typeof MaterialIcons)["name"] | undefined =
-    type === "email" ? "alternate-email" : type === "password" ? "lock" : undefined;
+    type === "email" ? "mail-outline" : type === "password" ? "lock" : undefined;
 
   const keyboardType: KeyboardTypeOptions =
     type === "email"
