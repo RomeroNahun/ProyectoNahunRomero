@@ -1,5 +1,6 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { UserProfile } from "../../utils/types/Recoleccion";
+import * as api from "../../services/recoleccionService";
 
 const defaultUserProfile: UserProfile = {
   nombre: "",
@@ -9,17 +10,41 @@ const defaultUserProfile: UserProfile = {
   vehiculo: "",
 };
 
+// trae el perfil del usuario autenticado desde la tabla profiles
+export const cargarPerfil = createAsyncThunk(
+  "userProfile/cargar",
+  async (userId: string) => await api.fetchProfile(userId),
+);
+
+// guarda (upsert) los cambios del perfil en Supabase
+export const guardarPerfil = createAsyncThunk(
+  "userProfile/guardar",
+  async ({
+    userId,
+    profile,
+  }: {
+    userId: string;
+    profile: Partial<UserProfile>;
+  }) => await api.upsertProfile(userId, profile),
+);
+
 const userProfileSlice = createSlice({
   name: "userProfile",
   initialState: defaultUserProfile,
   reducers: {
-    updateProfile: (state, action: PayloadAction<Partial<UserProfile>>) => {
-      Object.assign(state, action.payload);
-    },
     resetProfile: () => defaultUserProfile,
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(cargarPerfil.fulfilled, (state, action) => {
+        if (action.payload) Object.assign(state, action.payload);
+      })
+      .addCase(guardarPerfil.fulfilled, (state, action) => {
+        Object.assign(state, action.payload);
+      });
   },
 });
 
-export const { updateProfile, resetProfile } = userProfileSlice.actions;
+export const { resetProfile } = userProfileSlice.actions;
 
 export default userProfileSlice.reducer;
