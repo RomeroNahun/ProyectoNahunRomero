@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import { CompositeScreenProps } from "@react-navigation/native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -31,22 +31,31 @@ export default function ReportarBasuraScreen({ navigation }: Props) {
   const [tipoResiduo, setTipoResiduo] = useState<TipoResiduo>("organica");
   const [notas, setNotas] = useState("");
 
-  const handleReportar = () => {
+  const [guardando, setGuardando] = useState(false);
+
+  const handleReportar = async () => {
     if (!direccion.trim()) return;
-    // prioridad inmediata: queremos que pasen a la brevedad
-    dispatch(
-      addSolicitud({
-        direccion: direccion.trim(),
-        tipoResiduo,
-        prioridad: "inmediata",
-        horaProgramada: "",
-        notas: notas.trim(),
-      }),
-    );
-    setDireccion("");
-    setNotas("");
-    setTipoResiduo("organica");
-    navigation.navigate("Solicitudes");
+    setGuardando(true);
+    try {
+      // prioridad inmediata: queremos que pasen a la brevedad
+      await dispatch(
+        addSolicitud({
+          direccion: direccion.trim(),
+          tipoResiduo,
+          prioridad: "inmediata",
+          horaProgramada: "",
+          notas: notas.trim(),
+        }),
+      ).unwrap();
+      setDireccion("");
+      setNotas("");
+      setTipoResiduo("organica");
+      navigation.navigate("Solicitudes");
+    } catch (e) {
+      Alert.alert("Error", "No se pudo guardar la solicitud. Intenta de nuevo.");
+    } finally {
+      setGuardando(false);
+    }
   };
 
   return (
@@ -83,7 +92,10 @@ export default function ReportarBasuraScreen({ navigation }: Props) {
       />
 
       <View style={styles.actions}>
-        <CustomButton title="Solicitar recolección" onPress={handleReportar} />
+        <CustomButton
+          title={guardando ? "Guardando..." : "Solicitar recolección"}
+          onPress={handleReportar}
+        />
       </View>
     </ScreenWrapper>
   );

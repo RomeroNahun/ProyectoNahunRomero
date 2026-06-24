@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { View, Text, StyleSheet, Alert } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import ScreenWrapper from "../../components/ScreenWrapper";
@@ -7,7 +8,7 @@ import SectionTitle from "../../components/SectionTitle";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { updateProfile } from "../../store/slices/userProfileSlice";
+import { cargarPerfil, guardarPerfil } from "../../store/slices/userProfileSlice";
 import { ROL_LABELS } from "../../utils/types/Recoleccion";
 
 
@@ -21,11 +22,41 @@ export default function ProfileScreen() {
   const [telefono, setTelefono] = useState(userProfile.telefono);
   const [direccion, setDireccion] = useState(userProfile.direccion);
   const [vehiculo, setVehiculo] = useState(userProfile.vehiculo);
+  const [guardando, setGuardando] = useState(false);
 
   const esRecolector = userProfile.rol === "recolector";
 
-  const handleSave = () => {
-    dispatch(updateProfile({ nombre, telefono, direccion, vehiculo }));
+  // trae el perfil desde Supabase al tomar foco
+  useFocusEffect(
+    useCallback(() => {
+      if (user?.id) dispatch(cargarPerfil(user.id));
+    }, [dispatch, user?.id]),
+  );
+
+  // sincroniza los inputs cuando llega el perfil desde la DB
+  useEffect(() => {
+    setNombre(userProfile.nombre);
+    setTelefono(userProfile.telefono);
+    setDireccion(userProfile.direccion);
+    setVehiculo(userProfile.vehiculo);
+  }, [userProfile]);
+
+  const handleSave = async () => {
+    if (!user?.id) return;
+    setGuardando(true);
+    try {
+      await dispatch(
+        guardarPerfil({
+          userId: user.id,
+          profile: { nombre, telefono, direccion, vehiculo },
+        }),
+      ).unwrap();
+      Alert.alert("Listo", "Tu perfil se guardó correctamente.");
+    } catch (e) {
+      Alert.alert("Error", "No se pudo guardar el perfil. Intenta de nuevo.");
+    } finally {
+      setGuardando(false);
+    }
   };
 
   return (
@@ -63,7 +94,10 @@ export default function ProfileScreen() {
       )}
 
       <View style={styles.actions}>
-        <CustomButton title="Guardar perfil" onPress={handleSave} />
+        <CustomButton
+          title={guardando ? "Guardando..." : "Guardar perfil"}
+          onPress={handleSave}
+        />
       </View>
     </ScreenWrapper>
   );

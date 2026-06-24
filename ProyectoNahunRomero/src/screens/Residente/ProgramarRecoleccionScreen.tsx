@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Alert } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
@@ -26,19 +26,28 @@ export default function ProgramarRecoleccionScreen({ navigation }: Props) {
   const [horaProgramada, setHoraProgramada] = useState("");
   const [notas, setNotas] = useState("");
 
-  const handleProgramar = () => {
+  const [guardando, setGuardando] = useState(false);
+
+  const handleProgramar = async () => {
     if (!direccion.trim() || !horaProgramada.trim()) return;
-    // prioridad programada: se recolecta a la hora indicada
-    dispatch(
-      addSolicitud({
-        direccion: direccion.trim(),
-        tipoResiduo,
-        prioridad: "programada",
-        horaProgramada: horaProgramada.trim(),
-        notas: notas.trim(),
-      }),
-    );
-    navigation.goBack();
+    setGuardando(true);
+    try {
+      // prioridad programada: se recolecta a la hora indicada
+      await dispatch(
+        addSolicitud({
+          direccion: direccion.trim(),
+          tipoResiduo,
+          prioridad: "programada",
+          horaProgramada: horaProgramada.trim(),
+          notas: notas.trim(),
+        }),
+      ).unwrap();
+      navigation.goBack();
+    } catch (e) {
+      Alert.alert("Error", "No se pudo programar la recolección. Intenta de nuevo.");
+    } finally {
+      setGuardando(false);
+    }
   };
 
   return (
@@ -82,7 +91,10 @@ export default function ProgramarRecoleccionScreen({ navigation }: Props) {
       />
 
       <View style={styles.actions}>
-        <CustomButton title="Programar" onPress={handleProgramar} />
+        <CustomButton
+          title={guardando ? "Programando..." : "Programar"}
+          onPress={handleProgramar}
+        />
         <CustomButton
           title="Cancelar"
           onPress={() => navigation.goBack()}

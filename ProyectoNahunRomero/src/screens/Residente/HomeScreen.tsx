@@ -1,5 +1,6 @@
+import { useCallback } from "react";
 import { View, Text, StyleSheet } from "react-native";
-import { CompositeScreenProps } from "@react-navigation/native";
+import { CompositeScreenProps, useFocusEffect } from "@react-navigation/native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import CustomButton from "../../components/CustomButton";
@@ -9,7 +10,9 @@ import SolicitudCard from "../../components/SolicitudCard";
 import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import { i18n } from "../../contexts/LanguageContext";
-import { useAppSelector } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { cargarSolicitudes } from "../../store/slices/solicitudesSlice";
+import { cargarPerfil } from "../../store/slices/userProfileSlice";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { ResidenteTabsParamList } from "../../navigation/ResidenteTabsNavigator";
 
@@ -19,11 +22,20 @@ type Props = CompositeScreenProps<
 >;
 
 export default function HomeScreen({ navigation }: Props) {
+  const dispatch = useAppDispatch();
   const solicitudes = useAppSelector((state) => state.solicitudes.solicitudes);
   const profile = useAppSelector((state) => state.userProfile);
 
   const { user } = useAuth();
   const { colors } = useTheme();
+
+  // recarga las solicitudes y el perfil cada vez que la pantalla toma foco
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(cargarSolicitudes());
+      if (user?.id) dispatch(cargarPerfil(user.id));
+    }, [dispatch, user?.id]),
+  );
 
   const pendientes = solicitudes.filter(
     (s) => s.estado === "pendiente" || s.estado === "programada",

@@ -1,5 +1,6 @@
+import { useCallback } from "react";
 import { Text, StyleSheet } from "react-native";
-import { CompositeScreenProps } from "@react-navigation/native";
+import { CompositeScreenProps, useFocusEffect } from "@react-navigation/native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import ScreenWrapper from "../../components/ScreenWrapper";
@@ -7,7 +8,8 @@ import SectionTitle from "../../components/SectionTitle";
 import SolicitudCard from "../../components/SolicitudCard";
 import CustomButton from "../../components/CustomButton";
 import { useTheme } from "../../contexts/ThemeContext";
-import { useAppSelector } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { cargarSolicitudes } from "../../store/slices/solicitudesSlice";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { ResidenteTabsParamList } from "../../navigation/ResidenteTabsNavigator";
 
@@ -17,8 +19,15 @@ type Props = CompositeScreenProps<
 >;
 
 export default function MisSolicitudesScreen({ navigation }: Props) {
+  const dispatch = useAppDispatch();
   const solicitudes = useAppSelector((state) => state.solicitudes.solicitudes);
   const { colors } = useTheme();
+
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(cargarSolicitudes());
+    }, [dispatch]),
+  );
 
   return (
     <ScreenWrapper>

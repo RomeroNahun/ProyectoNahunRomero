@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { CompositeScreenProps } from "@react-navigation/native";
+import { useCallback, useState } from "react";
+import { View, Text, StyleSheet, Alert } from "react-native";
+import { CompositeScreenProps, useFocusEffect } from "@react-navigation/native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import CustomInput from "../../components/CustomInput";
@@ -10,7 +10,8 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import SectionTitle from "../../components/SectionTitle";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { crearRuta } from "../../store/slices/rutasSlice";
+import { cargarRutas, crearRuta } from "../../store/slices/rutasSlice";
+import { cargarSolicitudes } from "../../store/slices/solicitudesSlice";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { RecolectorTabsParamList } from "../../navigation/RecolectorTabsNavigator";
 
@@ -29,20 +30,32 @@ export default function RutasScreen({ navigation }: Props) {
   const [distancia, setDistancia] = useState("");
   const [combustible, setCombustible] = useState("");
 
-  const handleCrearRuta = () => {
+  // las rutas necesitan las solicitudes cargadas para mostrar/asignar paradas
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(cargarRutas());
+      dispatch(cargarSolicitudes());
+    }, [dispatch]),
+  );
+
+  const handleCrearRuta = async () => {
     if (!nombre.trim()) return;
-    dispatch(
-      crearRuta({
-        nombre: nombre.trim(),
-        solicitudIds: [],
-        distanciaKm: parseFloat(distancia) || 0,
-        combustibleEstimado: parseFloat(combustible) || 0,
-      }),
-    );
-    setNombre("");
-    setDistancia("");
-    setCombustible("");
-    setShowForm(false);
+    try {
+      await dispatch(
+        crearRuta({
+          nombre: nombre.trim(),
+          solicitudIds: [],
+          distanciaKm: parseFloat(distancia) || 0,
+          combustibleEstimado: parseFloat(combustible) || 0,
+        }),
+      ).unwrap();
+      setNombre("");
+      setDistancia("");
+      setCombustible("");
+      setShowForm(false);
+    } catch (e) {
+      Alert.alert("Error", "No se pudo crear la ruta. Intenta de nuevo.");
+    }
   };
 
   return (

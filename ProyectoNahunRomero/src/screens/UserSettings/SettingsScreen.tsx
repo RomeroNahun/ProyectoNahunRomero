@@ -13,8 +13,8 @@ export default function SettingsScreen() {
   const { changeLanguage, clearLanguage, language } = useLanguage();
   const { colors, toggleTheme, isDark } = useTheme();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     if (navigationRef.isReady()) {
       navigationRef.reset({
         index: 0,
