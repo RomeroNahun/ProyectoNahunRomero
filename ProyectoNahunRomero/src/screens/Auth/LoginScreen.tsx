@@ -31,13 +31,8 @@ export default function LoginScreen({ navigation }: Props) {
       Alert.alert("No se pudo iniciar sesión", res.error);
       return;
     }
-    // el rol viene de la cuenta: entra a la seccion que le corresponde
-    navigation.reset({
-      index: 0,
-      routes: [
-        { name: res.rol === "recolector" ? "RecolectorTabs" : "ResidenteTabs" },
-      ],
-    });
+    // al iniciar sesion el AuthContext setea el user y el navegador
+    // cambia solo a los tabs del rol correspondiente
   };
 
   return (

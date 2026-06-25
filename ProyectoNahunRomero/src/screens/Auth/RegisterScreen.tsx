@@ -53,12 +53,8 @@ export default function RegisterScreen({ navigation }: Props) {
       return;
     }
 
-    navigation.reset({
-      index: 0,
-      routes: [
-        { name: res.rol === "recolector" ? "RecolectorTabs" : "ResidenteTabs" },
-      ],
-    });
+    // con sesion creada, el AuthContext setea el user y el navegador
+    // cambia solo a los tabs del rol correspondiente
   };
 
   return (

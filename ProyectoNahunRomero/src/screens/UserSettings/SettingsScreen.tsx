@@ -5,7 +5,6 @@ import SectionTitle from "../../components/SectionTitle";
 import { useAuth } from "../../contexts/AuthContext";
 import { useLanguage, i18n } from "../../contexts/LanguageContext";
 import { useTheme } from "../../contexts/ThemeContext";
-import { navigationRef } from "../../navigation/NavigationService";
 
 
 export default function SettingsScreen() {
@@ -13,14 +12,10 @@ export default function SettingsScreen() {
   const { changeLanguage, clearLanguage, language } = useLanguage();
   const { colors, toggleTheme, isDark } = useTheme();
 
+  // al cerrar sesion el AuthContext pone user en null y el navegador
+  // vuelve solo a la pantalla de Login
   const handleLogout = async () => {
     await logout();
-    if (navigationRef.isReady()) {
-      navigationRef.reset({
-        index: 0,
-        routes: [{ name: "Login" }],
-      });
-    }
   };
 
   return (
