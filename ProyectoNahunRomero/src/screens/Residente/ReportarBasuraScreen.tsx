@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { View, Text, StyleSheet, Alert, Image } from "react-native";
-import { CompositeScreenProps } from "@react-navigation/native";
+import { CompositeScreenProps, useFocusEffect } from "@react-navigation/native";
 import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import * as ImagePicker from "expo-image-picker";
@@ -8,9 +8,11 @@ import CustomInput from "../../components/CustomInput";
 import CustomButton from "../../components/CustomButton";
 import ScreenWrapper from "../../components/ScreenWrapper";
 import SectionTitle from "../../components/SectionTitle";
+import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
-import { useAppDispatch } from "../../store/hooks";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { addSolicitud } from "../../store/slices/solicitudesSlice";
+import { cargarPerfil } from "../../store/slices/userProfileSlice";
 import { uploadFotoSolicitud } from "../../services/recoleccionService";
 import { RootStackParamList } from "../../navigation/StackNavigator";
 import { ResidenteTabsParamList } from "../../navigation/ResidenteTabsNavigator";
@@ -27,7 +29,9 @@ type Props = CompositeScreenProps<
 
 export default function ReportarBasuraScreen({ navigation }: Props) {
   const dispatch = useAppDispatch();
+  const { user } = useAuth();
   const { colors } = useTheme();
+  const profile = useAppSelector((state) => state.userProfile);
 
   const [direccion, setDireccion] = useState("");
   const [tipoResiduo, setTipoResiduo] = useState<TipoResiduo>("organica");
@@ -36,6 +40,18 @@ export default function ReportarBasuraScreen({ navigation }: Props) {
   const [fotoUri, setFotoUri] = useState<string | null>(null);
 
   const [guardando, setGuardando] = useState(false);
+
+  // trae el perfil del residente al tomar foco para conocer su direccion
+  useFocusEffect(
+    useCallback(() => {
+      if (user?.id) dispatch(cargarPerfil(user.id));
+    }, [dispatch, user?.id]),
+  );
+
+  // precarga la direccion guardada en el perfil (el usuario puede editarla)
+  useEffect(() => {
+    if (profile.direccion) setDireccion(profile.direccion);
+  }, [profile.direccion]);
 
   // abre la galeria para elegir una imagen como evidencia
   const seleccionarFoto = async () => {
