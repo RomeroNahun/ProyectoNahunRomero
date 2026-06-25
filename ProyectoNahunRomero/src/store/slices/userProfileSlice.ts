@@ -39,6 +39,11 @@ const userProfileSlice = createSlice({
       .addCase(cargarPerfil.fulfilled, (state, action) => {
         if (action.payload) Object.assign(state, action.payload);
       })
+      .addCase(cargarPerfil.rejected, (_state, action) => {
+        // si el SELECT falla (p. ej. permisos/RLS), lo registramos en vez de
+        // dejar el perfil en blanco sin ninguna pista del motivo
+        console.error("No se pudo cargar el perfil:", action.error.message);
+      })
       .addCase(guardarPerfil.fulfilled, (state, action) => {
         Object.assign(state, action.payload);
       });
