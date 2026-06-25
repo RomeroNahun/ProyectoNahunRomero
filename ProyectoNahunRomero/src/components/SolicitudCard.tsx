@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTheme } from "../contexts/ThemeContext";
 import {
@@ -38,6 +38,13 @@ export default function SolicitudCard({ solicitud, onPress }: SolicitudCardProps
         </View>
         <Ionicons name="chevron-forward" size={20} color={colors.secondary} />
       </View>
+      {solicitud.fotoUrl ? (
+        <Image
+          source={{ uri: solicitud.fotoUrl }}
+          style={styles.foto}
+          resizeMode="cover"
+        />
+      ) : null}
       <View style={styles.footer}>
         <EstadoBadge estado={solicitud.estado} />
       </View>
@@ -72,6 +79,12 @@ const styles = StyleSheet.create({
   hora: {
     fontSize: 12,
     marginTop: 2,
+  },
+  foto: {
+    width: "100%",
+    height: 160,
+    borderRadius: 9,
+    marginTop: 10,
   },
   footer: {
     marginTop: 10,
