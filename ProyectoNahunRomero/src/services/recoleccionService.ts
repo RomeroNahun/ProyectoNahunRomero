@@ -74,11 +74,19 @@ const check = <T>(data: T | null, error: { message: string } | null): T => {
 // ============================================================
 // SOLICITUDES
 // ============================================================
-export const fetchSolicitudes = async (): Promise<Solicitud[]> => {
-  const { data, error } = await supabase
+// si se pasa residenteId, devuelve solo las solicitudes de ese usuario;
+// si no, devuelve todas (lo usa el recolector)
+export const fetchSolicitudes = async (
+  residenteId?: string,
+): Promise<Solicitud[]> => {
+  let query = supabase
     .from("solicitudes")
     .select("*")
     .order("creada_en", { ascending: true });
+
+  if (residenteId) query = query.eq("residente_id", residenteId);
+
+  const { data, error } = await query;
   return check(data as SolicitudRow[], error).map(mapSolicitud);
 };
 
@@ -88,6 +96,9 @@ export const insertSolicitud = async (
   // si es programada queda "programada", si no, "pendiente"
   const estado: EstadoSolicitud =
     input.prioridad === "programada" ? "programada" : "pendiente";
+
+  // asocia la solicitud al usuario autenticado que la crea
+  const { data: userData } = await supabase.auth.getUser();
 
   const { data, error } = await supabase
     .from("solicitudes")
@@ -99,6 +110,7 @@ export const insertSolicitud = async (
       hora_programada: input.horaProgramada,
       notas: input.notas,
       foto_url: input.fotoUrl ?? null,
+      residente_id: userData.user?.id ?? null,
     })
     .select()
     .single();

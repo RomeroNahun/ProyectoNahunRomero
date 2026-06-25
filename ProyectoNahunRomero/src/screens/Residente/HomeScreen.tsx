@@ -29,11 +29,13 @@ export default function HomeScreen({ navigation }: Props) {
   const { user } = useAuth();
   const { colors } = useTheme();
 
-  // recarga las solicitudes y el perfil cada vez que la pantalla toma foco
+  // recarga las solicitudes del propio residente y su perfil al tomar foco
   useFocusEffect(
     useCallback(() => {
-      dispatch(cargarSolicitudes());
-      if (user?.id) dispatch(cargarPerfil(user.id));
+      if (user?.id) {
+        dispatch(cargarSolicitudes(user.id));
+        dispatch(cargarPerfil(user.id));
+      }
     }, [dispatch, user?.id]),
   );
 

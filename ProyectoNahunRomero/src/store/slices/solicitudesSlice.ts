@@ -14,10 +14,12 @@ const initialState: SolicitudesState = {
   error: null,
 };
 
-// trae todas las solicitudes desde Supabase
+// trae las solicitudes desde Supabase; si se pasa un residenteId, trae solo
+// las de ese usuario (residente). Sin argumento las trae todas (recolector).
 export const cargarSolicitudes = createAsyncThunk(
   "solicitudes/cargar",
-  async () => await api.fetchSolicitudes(),
+  async (residenteId: string | undefined = undefined) =>
+    await api.fetchSolicitudes(residenteId),
 );
 
 // crea una solicitud; el id, la fecha y el estado los define el servicio/DB

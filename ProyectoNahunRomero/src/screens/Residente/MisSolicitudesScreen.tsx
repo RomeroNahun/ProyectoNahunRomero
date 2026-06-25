@@ -7,6 +7,7 @@ import ScreenWrapper from "../../components/ScreenWrapper";
 import SectionTitle from "../../components/SectionTitle";
 import SolicitudCard from "../../components/SolicitudCard";
 import CustomButton from "../../components/CustomButton";
+import { useAuth } from "../../contexts/AuthContext";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { cargarSolicitudes } from "../../store/slices/solicitudesSlice";
@@ -21,12 +22,14 @@ type Props = CompositeScreenProps<
 export default function MisSolicitudesScreen({ navigation }: Props) {
   const dispatch = useAppDispatch();
   const solicitudes = useAppSelector((state) => state.solicitudes.solicitudes);
+  const { user } = useAuth();
   const { colors } = useTheme();
 
+  // solo las solicitudes generadas por el residente autenticado
   useFocusEffect(
     useCallback(() => {
-      dispatch(cargarSolicitudes());
-    }, [dispatch]),
+      if (user?.id) dispatch(cargarSolicitudes(user.id));
+    }, [dispatch, user?.id]),
   );
 
   return (
