@@ -24,6 +24,13 @@ export type EstadoSolicitud =
 // Estado de una ruta del recolector
 export type EstadoRuta = "planificada" | "en_curso" | "completada";
 
+// Datos basicos del residente que genero la solicitud (los ve el recolector)
+export type Solicitante = {
+  nombre: string;
+  telefono: string;
+  direccion: string;
+};
+
 // Entidad central: una solicitud para que pasen a recolectar la basura
 export type Solicitud = {
   id: string;
@@ -36,6 +43,8 @@ export type Solicitud = {
   creadaEn: number;
   // URL publica de la foto adjunta en Supabase Storage (opcional)
   fotoUrl?: string;
+  // datos del residente que la envio (se cargan via join con profiles)
+  solicitante?: Solicitante;
 };
 
 // Ruta optimizada que agrupa varias solicitudes para ahorrar combustible

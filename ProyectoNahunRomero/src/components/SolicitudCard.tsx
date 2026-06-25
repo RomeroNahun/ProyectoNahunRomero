@@ -11,10 +11,17 @@ import EstadoBadge from "./EstadoBadge";
 type SolicitudCardProps = {
   solicitud: Solicitud;
   onPress: () => void;
+  // muestra los datos del residente que envio la solicitud (vista recolector)
+  mostrarSolicitante?: boolean;
 };
 
-export default function SolicitudCard({ solicitud, onPress }: SolicitudCardProps) {
+export default function SolicitudCard({
+  solicitud,
+  onPress,
+  mostrarSolicitante = false,
+}: SolicitudCardProps) {
   const { colors } = useTheme();
+  const solicitante = solicitud.solicitante;
 
   return (
     <TouchableOpacity
@@ -44,6 +51,24 @@ export default function SolicitudCard({ solicitud, onPress }: SolicitudCardProps
           style={styles.foto}
           resizeMode="cover"
         />
+      ) : null}
+      {mostrarSolicitante && solicitante ? (
+        <View style={[styles.solicitante, { borderTopColor: colors.border }]}>
+          <View style={styles.solicitanteRow}>
+            <Ionicons name="person-outline" size={14} color={colors.secondary} />
+            <Text style={[styles.solicitanteTexto, { color: colors.buttonTertiaryText }]}>
+              {solicitante.nombre || "Sin nombre"}
+            </Text>
+          </View>
+          {solicitante.telefono ? (
+            <View style={styles.solicitanteRow}>
+              <Ionicons name="call-outline" size={14} color={colors.secondary} />
+              <Text style={[styles.solicitanteTexto, { color: colors.textSecondary }]}>
+                {solicitante.telefono}
+              </Text>
+            </View>
+          ) : null}
+        </View>
       ) : null}
       <View style={styles.footer}>
         <EstadoBadge estado={solicitud.estado} />
@@ -85,6 +110,21 @@ const styles = StyleSheet.create({
     height: 160,
     borderRadius: 9,
     marginTop: 10,
+  },
+  solicitante: {
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    gap: 4,
+  },
+  solicitanteRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+  },
+  solicitanteTexto: {
+    fontSize: 13,
+    fontWeight: "500",
   },
   footer: {
     marginTop: 10,

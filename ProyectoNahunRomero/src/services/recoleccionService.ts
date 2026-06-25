@@ -13,6 +13,13 @@ import {
 // ============================================================
 // Tipos de fila tal como vienen de la base de datos (snake_case)
 // ============================================================
+// datos del residente embebidos via join con profiles
+type SolicitanteRow = {
+  nombre: string | null;
+  telefono: string | null;
+  direccion: string | null;
+} | null;
+
 type SolicitudRow = {
   id: string;
   direccion: string;
@@ -23,6 +30,7 @@ type SolicitudRow = {
   notas: string;
   creada_en: string;
   foto_url: string | null;
+  residente?: SolicitanteRow;
 };
 
 type RutaRow = {
@@ -54,6 +62,13 @@ const mapSolicitud = (r: SolicitudRow): Solicitud => ({
   notas: r.notas ?? "",
   creadaEn: new Date(r.creada_en).getTime(),
   fotoUrl: r.foto_url ?? undefined,
+  solicitante: r.residente
+    ? {
+        nombre: r.residente.nombre ?? "",
+        telefono: r.residente.telefono ?? "",
+        direccion: r.residente.direccion ?? "",
+      }
+    : undefined,
 });
 
 const mapRuta = (r: RutaRow, solicitudIds: string[]): Ruta => ({
@@ -81,7 +96,9 @@ export const fetchSolicitudes = async (
 ): Promise<Solicitud[]> => {
   let query = supabase
     .from("solicitudes")
-    .select("*")
+    .select(
+      "*, residente:profiles!residente_id(nombre, telefono, direccion)",
+    )
     .order("creada_en", { ascending: true });
 
   if (residenteId) query = query.eq("residente_id", residenteId);

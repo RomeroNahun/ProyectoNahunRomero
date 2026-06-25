@@ -52,6 +52,7 @@ export default function SolicitudesPendientesScreen({ navigation }: Props) {
           <SolicitudCard
             key={solicitud.id}
             solicitud={solicitud}
+            mostrarSolicitante
             onPress={() =>
               navigation.navigate("DetalleSolicitud", { solicitudId: solicitud.id })
             }
