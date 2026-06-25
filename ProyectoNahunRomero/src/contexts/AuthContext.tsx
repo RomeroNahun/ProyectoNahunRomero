@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "../services/supabaseClient";
+import { upsertProfile } from "../services/recoleccionService";
 import { Rol } from "../utils/types/Recoleccion";
 
 // 1. Tipado del objeto principal del contexto
@@ -107,6 +108,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // si la confirmacion de correo esta activada, no hay sesion todavia
     if (!data.session) return { rol, needsConfirmation: true };
+
+    // con sesion activa, escribimos el perfil desde la app para no depender
+    // del trigger de la DB: asi el nombre, telefono y rol quedan disponibles
+    if (data.user) {
+      try {
+        await upsertProfile(data.user.id, { nombre, telefono, rol });
+      } catch {
+        // si falla (p. ej. el trigger ya creo la fila) no bloqueamos el registro
+      }
+    }
     return { rol };
   };
 
