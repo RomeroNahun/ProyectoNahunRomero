@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "../services/supabaseClient";
-import { upsertProfile } from "../services/recoleccionService";
+import { ensureProfile, upsertProfile } from "../services/recoleccionService";
 import { Rol } from "../utils/types/Recoleccion";
 
 // 1. Tipado del objeto principal del contexto
@@ -85,6 +85,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       password,
     });
     if (error) return { rol: null, error: error.message };
+
+    // refuerzo: si el perfil quedo vacio (p. ej. el trigger no copio los datos),
+    // lo rellenamos desde los metadatos de Auth al iniciar sesion
+    if (data.user) {
+      try {
+        await ensureProfile(data.user.id, {
+          nombre: (data.user.user_metadata?.full_name as string) ?? "",
+          telefono: (data.user.user_metadata?.phone as string) ?? "",
+          rol: getRol(data.session),
+        });
+      } catch {
+        // no bloqueamos el login si el refuerzo falla
+      }
+    }
     return { rol: getRol(data.session) };
   };
 

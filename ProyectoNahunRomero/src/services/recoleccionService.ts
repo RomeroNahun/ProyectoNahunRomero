@@ -323,3 +323,19 @@ export const upsertProfile = async (
     vehiculo: r.vehiculo ?? "",
   };
 };
+
+// Garantiza que el perfil tenga datos: si no existe o esta vacio, lo rellena
+// con los valores de respaldo (que vienen de los metadatos de Auth). No pisa
+// un nombre ya guardado, para respetar lo que el usuario haya editado.
+export const ensureProfile = async (
+  userId: string,
+  fallback: { nombre: string; telefono: string; rol: UserProfile["rol"] },
+): Promise<void> => {
+  const existing = await fetchProfile(userId);
+  if (existing?.nombre) return; // ya tiene datos, no tocamos nada
+  await upsertProfile(userId, {
+    nombre: existing?.nombre || fallback.nombre,
+    telefono: existing?.telefono || fallback.telefono,
+    rol: fallback.rol,
+  });
+};
